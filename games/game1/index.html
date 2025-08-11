@@ -1,7 +1,200 @@
-<!doctype html><html><head><meta charset="utf-8"><title>Game 1 - Unity placeholder</title>
-<link rel="stylesheet" href="../../style.css"></head><body style="background:#000;color:#9fdfff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">
-<div style="text-align:center;max-width:900px;padding:20px">
-  <h1>Game 1 — Unity WebGL Placeholder</h1>
-  <p>To use this, export your Unity WebGL build into <code>games/game1/Build/</code>. Ensure the loader script is named <code>UnityLoader.js</code> (or the default Unity-generated loader) and that the build files are in the <code>Build</code> folder.</p>
-  <p>Once the files exist, the homepage overlay will inject the loader script automatically and the game canvas will appear in the overlay.</p>
-</div></body></html>
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8" />
+    <title>Tahiliani's Hub</title>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes">
+
+    <style>
+        @font-face {
+            font-family: "Etna";
+            src: url("TemplateData/etna-free-font.otf") format("opentype");
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            font-family: "Etna", sans-serif;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        #unity-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: var(--app-height);
+            background: #000;
+            display: block;
+        }
+
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: var(--app-height);
+            background: #000;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 9999;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+            #loader h2 {
+                font-size: 1.4rem;
+                max-width: 500px;
+                font-variant: small-caps;
+                font-weight: normal;
+            }
+
+        #progress-text {
+            margin-top: 20px;
+            font-size: 1rem;
+            color: grey;
+            font-weight: lighter;
+            font-variant: small-caps;
+        }
+
+        @keyframes blink {
+            0% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.4);
+            }
+
+            100% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+        }
+
+        #rotate-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: var(--app-height);
+            background: #000;
+            color: #fff;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    <!--<div id="rotate-warning">
+        <p>Please rotate your device to <strong>portrait</strong> mode</p>
+    </div>-->
+
+    <div id="loader">
+        <h2 id="funny-line"></h2>
+        <div id="progress-text">Loading: 0%</div>
+    </div>
+
+    <script>
+        const funnyLines = [
+            "Loading faster than your ex moved on 💀",
+            "Almost there... like your crush in your DMs (never).",
+            "Unpacking vibes... please wait ✨📦",
+            "Downloading motivation... 404 not found.",
+            "Loading... because teleportation isn’t real yet.",
+            "Hold on, the hamster running the server needs a Red Bull.",
+            "Our devs said it would be fast. They lied.",
+            "Fetching your awesomeness... might take a while.",
+            "Loading like a Netflix show on 2G.",
+            "Be patient. Rome wasn't rendered in a frame.",
+            "If this takes longer than your relationship, we’re sorry.",
+            "Calculating pi... just kidding, loading game.",
+            "Rendering pixels like it's Minecraft in 2009.",
+            "Bringing the heat... after this long-ass load.",
+            "Still faster than Indian matchmaking.",
+            "Please wait... even your future is buffering.",
+            "Installing chaos.exe",
+            "Breathe in... breathe out... we’re almost done.",
+            "Loading so slow even grandma could beat it in ludo.",
+            "Plotting a world takeover, disguised as a loading screen."
+        ];
+
+
+        document.getElementById("funny-line").innerText = funnyLines[Math.floor(Math.random() * funnyLines.length)];
+    </script>
+
+
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+
+    <script src="Build/Mobile.loader.js"></script>
+    <script>
+        // Set custom CSS height variable
+        function setAppHeight() {
+            const appHeight = window.innerHeight;
+            document.documentElement.style.setProperty('--app-height', `${appHeight}px`);
+        }
+
+        // Orientation handling
+        //function checkOrientation() {
+        //    const warning = document.getElementById('rotate-warning');
+        //    warning.style.display = (window.innerWidth > window.innerHeight) ? 'flex' : 'none';
+        //}
+
+        // Event listeners
+        window.addEventListener("resize", () => {
+            setAppHeight();
+            /*checkOrientation();*/
+        });
+
+        window.addEventListener("orientationchange", () => {
+            setAppHeight();
+            /*checkOrientation();*/
+        });
+
+        // Initial setup
+        setAppHeight();
+        /*checkOrientation();*/
+
+        // Load Unity instance
+        createUnityInstance(document.querySelector("#unity-canvas"), {
+            dataUrl: "Build/Mobile.data.unityweb",
+            frameworkUrl: "Build/Mobile.framework.js.unityweb",
+            codeUrl: "Build/Mobile.wasm.unityweb",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "DefaultCompany",
+            productName: "Landing page",
+            productVersion: "0.1.0"
+        }, (progress) => {
+            document.getElementById("progress-text").innerText = `Loading: ${Math.round(progress * 100)}%`;
+
+            // Show a new funny line every 20% of progress
+            if (!window.lastFunnyStep) window.lastFunnyStep = 0;
+
+            if (progress - window.lastFunnyStep >= 0.2 || progress === 1) {
+                window.lastFunnyStep = progress;
+                document.getElementById("funny-line").innerText = funnyLines[Math.floor(Math.random() * funnyLines.length)];
+            }
+        }).then(() => {
+            document.getElementById("loader").style.display = "none";
+        }).catch((message) => {
+            alert(message);
+        });
+    </script>
+</body>
+</html>
