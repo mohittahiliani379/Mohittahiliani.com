@@ -1,0 +1,1 @@
+Place your Unity WebGL build files here. Typical files: UnityLoader.js, Build.data, Build.wasm, Build.framework.js, etc.

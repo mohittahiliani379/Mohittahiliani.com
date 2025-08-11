@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mohit Tahiliani — Game Developer | Teacher | Creator</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Etna will load from local files: assets/fonts/etna.woff2 (preferred) or assets/fonts/etna.otf -->
+  <style>
+  @font-face {
+    font-family: 'EtnaLocal';
+    src: url('assets/fonts/etna.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'EtnaLocalFallback';
+    src: url('assets/fonts/etna.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/three@0.154.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.154.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+  <div id="loader">Loading…</div>
+  <div id="bg-scene"></div>
+
+  <header class="hud">
+    <div class="brand">
+      <h1 class="site-title">Mohit Tahiliani</h1>
+      <p class="tagline">Game Developer | Teacher | Creator</p>
+    </div>
+
+    <nav class="hero-ctas">
+      <button class="cta" id="playGames">🎮 Play Games</button>
+      <button class="cta" id="learnMe">📚 Learn from Me</button>
+      <button class="cta" id="workWith">🚀 Work with Me</button>
+    </nav>
+    <div class="audio-control" id="audioControl" title="Toggle audio">
+      <button id="audioToggle">🔊</button>
+      <input id="audioRange" type="range" min="0" max="1" step="0.01" value="0.35" />
+    </div>
+    <div class="scroll-hint">Scroll ↓</div>
+  </header>
+
+  <main id="site" aria-live="polite">
+    <section id="hero" class="panel hero-panel">
+      <!-- city canvas sits behind via #bg-scene -->
+      <div class="hero-overlay">
+        <div id="hologram" class="holo">WELCOME</div>
+      </div>
+    </section>
+
+    <section id="games" class="panel">
+      <h2>Games</h2>
+      <div class="grid" id="gamesGrid"></div>
+    </section>
+
+    <section id="courses" class="panel">
+      <h2>Courses</h2>
+      <div class="cards" id="coursesGrid"></div>
+    </section>
+
+    <section id="portfolio" class="panel">
+      <h2>Portfolio</h2>
+      <div class="grid" id="portfolioGrid"></div>
+    </section>
+
+    <section id="testimonials" class="panel">
+      <h2>Testimonials</h2>
+      <div class="testimonials" id="testi"></div>
+    </section>
+
+    <section id="contact" class="panel">
+      <h2>Contact</h2>
+      <form id="contactForm">
+        <input type="text" name="name" placeholder="Your name" required />
+        <input type="email" name="email" placeholder="Your email" required />
+        <textarea name="message" placeholder="Message" rows="4"></textarea>
+        <button class="cta dark" type="submit">Send Message</button>
+      </form>
+      <div class="socials">
+        <a href="#" aria-label="Instagram">Instagram</a> ·
+        <a href="#" aria-label="LinkedIn">LinkedIn</a> ·
+        <a href="#" aria-label="Discord">Discord</a> ·
+        <a href="#" aria-label="WhatsApp">WhatsApp</a>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal"><div class="modal-content"><button id="closeModal" class="close">✕</button><div id="unityPlaceholder"><h3>Unity WebGL placeholder</h3><p>Drop your Unity WebGL build here as a separate page and link it from the cards.</p><div class="unity-box">[Unity WebGL will load here]</div></div></div></div>
+
+  <audio id="ambientAudio" src="assets/audio/ambient.mp3" loop></audio>
+  <audio id="hoverSfx" src="assets/audio/hover-buzz.mp3"></audio>
+  <audio id="clickSfx" src="assets/audio/glitch.mp3"></audio>
+
+  <script src="city.js"></script>
+  <script src="script.js"></script>
+
+<script>
+// Preload Unity WebGL files quietly so the game opens instantly when user clicks Play.
+// It tries to fetch common Unity build files from /games/game1/Build/ and marks 'unityPreloaded' when done.
+window.unityPreloaded = false;
+(function preloadUnity(){
+  const files = [
+    '/games/game1/Build/UnityLoader.js',
+    '/games/game1/Build/Build.data',
+    '/games/game1/Build/Build.framework.js',
+    '/games/game1/Build/Build.wasm'
+  ];
+  let fetched = 0;
+  files.forEach(url => {
+    fetch(url, {method:'GET', mode:'no-cors'}).then(()=>{
+      fetched++;
+      // when at least one file is available, mark as preloaded (best-effort)
+      if(fetched>=1) window.unityPreloaded = true;
+    }).catch(()=>{
+      // silent fail - build may be absent until you upload Unity files
+    });
+  });
+  // if not available, unityPreloaded remains false and the overlay loading UI will handle fallback.
+})();
+</script>
+
+  <!-- Fullscreen game overlay (Unity WebGL) -->
+  <div id="gameOverlay" class="game-overlay" aria-hidden="true">
+    <div class="game-overlay-inner">
+      <button id="closeGame" class="close-game">✕</button>
+      <div class="game-loader">
+        <div class="loader-title">LOADING GAME...</div>
+        <div class="progress-bar"><div class="progress-fill" id="gameProgress"></div></div>
+        <div class="loader-sub">Preparing holographic portal</div>
+      </div>
+      <div id="unityContainer" class="unity-container" aria-live="polite"></div>
+    </div>
+  </div>
+
+</body>
+</html>
